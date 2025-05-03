@@ -7,7 +7,7 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit; 
+    exit; // Exit if accessed directly
 }
 
 function register_custom_post_grid_widget() {
@@ -23,7 +23,7 @@ add_action('wp_ajax_nopriv_custom_post_grid_load_more', 'custom_post_grid_load_m
 function custom_post_grid_load_more() {
     $paged = isset($_POST['page']) ? intval($_POST['page']) : 1;
     $settings = isset($_POST['settings']) ? $_POST['settings'] : [];
- 
+    
     if (!is_array($settings) || empty($settings['post_type'])) {
         wp_send_json_error('Invalid settings data');
     }
@@ -42,9 +42,49 @@ function custom_post_grid_load_more() {
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
-            echo '<div class="custom-post-grid-item">';
-            echo '<h3>' . esc_html(get_the_title()) . '</h3>';
-            echo '<div>' . wp_kses_post(get_the_excerpt()) . '</div>';
+            
+            // Use the same rendering function as the initial load
+            echo '<div class="post-grid-item">';
+            
+            if ('yes' === $settings['show_featured_image'] && has_post_thumbnail()) {
+                echo '<div class="post-grid-image">';
+                echo '<a href="' . get_the_permalink() . '">';
+                the_post_thumbnail('large');
+                echo '</a>';
+                echo '</div>';
+            }
+            
+            if ('yes' === $settings['show_title']) {
+                echo '<h3 class="post-grid-title">';
+                echo '<a href="' . get_the_permalink() . '">' . get_the_title() . '</a>';
+                echo '</h3>';
+            }
+            
+            if ('yes' === $settings['show_desc']) {
+                echo '<div class="post-grid-excerpt">';
+                echo wp_trim_words(get_the_excerpt(), 20, '...');
+                echo '</div>';
+            }
+            
+            if ('yes' === $settings['show_meta']) {
+                echo '<div class="post-grid-meta">';
+                
+                if ('yes' === $settings['show_author']) {
+                    echo '<span class="post-grid-author">' . get_the_author() . '</span>';
+                }
+                
+                if ('yes' === $settings['show_date']) {
+                    echo '<span class="post-grid-date">' . get_the_date() . '</span>';
+                }
+                
+                if ('yes' === $settings['show_comments']) {
+                    echo '<span class="post-grid-comments">' . get_comments_number() . ' comments</span>';
+                }
+                
+                echo '</div>';
+            }
+            
+            echo '<hr class="post-grid-divider">';
             echo '</div>';
         }
     } else {
@@ -52,10 +92,12 @@ function custom_post_grid_load_more() {
     }
 
     wp_reset_postdata();
-
     $html = ob_get_clean();
 
-    wp_send_json_success(['html' => $html]);
+    wp_send_json_success([
+        'html' => $html,
+        'max_pages' => $query->max_num_pages
+    ]);
 }
 
 
