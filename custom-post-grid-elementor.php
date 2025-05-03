@@ -7,7 +7,7 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+    exit; 
 }
 
 function register_custom_post_grid_widget() {
@@ -23,8 +23,7 @@ add_action('wp_ajax_nopriv_custom_post_grid_load_more', 'custom_post_grid_load_m
 function custom_post_grid_load_more() {
     $paged = isset($_POST['page']) ? intval($_POST['page']) : 1;
     $settings = isset($_POST['settings']) ? $_POST['settings'] : [];
-
-    // Basic validation
+ 
     if (!is_array($settings) || empty($settings['post_type'])) {
         wp_send_json_error('Invalid settings data');
     }

@@ -1,23 +1,29 @@
 <?php
-class Custom_Post_Grid_Widget extends \Elementor\Widget_Base {
+class Custom_Post_Grid_Widget extends \Elementor\Widget_Base
+{
 
-    public function get_name() {
+    public function get_name()
+    {
         return 'custom_post_grid';
     }
 
-    public function get_title() {
+    public function get_title()
+    {
         return __('NF Custom Post Grid', 'custom-post-grid');
     }
 
-    public function get_icon() {
+    public function get_icon()
+    {
         return 'eicon-posts-grid';
     }
 
-    public function get_categories() {
+    public function get_categories()
+    {
         return ['general'];
     }
 
-    protected function register_controls() {
+    protected function register_controls()
+    {
         $this->start_controls_section(
             'content_section',
             [
@@ -96,6 +102,17 @@ class Custom_Post_Grid_Widget extends \Elementor\Widget_Base {
                 'default' => 'yes',
             ]
         );
+        $this->add_control(
+            'show_desc',
+            [
+                'label' => __('Show Description', 'custom-post-grid'),
+                'type' => \Elementor\Controls_Manager::SWITCHER,
+                'label_on' => __('Show', 'custom-post-grid'),
+                'label_off' => __('Hide', 'custom-post-grid'),
+                'return_value' => 'yes',
+                'default' => 'yes',
+            ]
+        );
 
         $this->add_control(
             'show_meta',
@@ -156,7 +173,7 @@ class Custom_Post_Grid_Widget extends \Elementor\Widget_Base {
 
         $this->end_controls_section();
 
-        // Style Section
+ 
         $this->start_controls_section(
             'style_section',
             [
@@ -175,6 +192,19 @@ class Custom_Post_Grid_Widget extends \Elementor\Widget_Base {
                 ],
                 'condition' => [
                     'show_title' => 'yes',
+                ],
+            ]
+        );
+        $this->add_control(
+            'desc_color',
+            [
+                'label' => __('desc Color', 'custom-post-grid'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .post-grid-desc' => 'color: {{VALUE}}',
+                ],
+                'condition' => [
+                    'show_desc' => 'yes',
                 ],
             ]
         );
@@ -222,7 +252,8 @@ class Custom_Post_Grid_Widget extends \Elementor\Widget_Base {
         $this->end_controls_section();
     }
 
-    protected function render() {
+    protected function render()
+    {
         $settings = $this->get_settings_for_display();
 
         $args = [
@@ -238,27 +269,28 @@ class Custom_Post_Grid_Widget extends \Elementor\Widget_Base {
         if ($query->have_posts()) {
             echo '<div class="custom-post-grid-wrapper" data-settings=\'' . wp_json_encode($settings) . '\' data-page="1">';
             echo '<div class="custom-post-grid">';
-            
+
             while ($query->have_posts()) {
                 $query->the_post();
                 $this->render_post_item($settings);
             }
 
-            echo '</div>'; // .custom-post-grid
+            echo '</div>';  
 
             if ($query->max_num_pages > 1) {
                 echo '<button class="post-grid-load-more" data-max-pages="' . esc_attr($query->max_num_pages) . '">' . __('Load More', 'custom-post-grid') . '</button>';
             }
 
-            echo '</div>'; // .custom-post-grid-wrapper
+            echo '</div>'; 
             wp_reset_postdata();
         } else {
             echo '<p>' . __('No posts found.', 'custom-post-grid') . '</p>';
         }
     }
 
-    protected function render_post_item($settings) {
-        ?>
+    protected function render_post_item($settings)
+    {
+?>
         <div class="post-grid-item">
             <?php if ('yes' === $settings['show_featured_image'] && has_post_thumbnail()) : ?>
                 <div class="post-grid-image">
@@ -267,47 +299,52 @@ class Custom_Post_Grid_Widget extends \Elementor\Widget_Base {
                     </a>
                 </div>
             <?php endif; ?>
-            
+
             <div class="post-grid-category">
-                <?php 
+                <?php
                 $categories = get_the_category();
                 if (!empty($categories)) {
                     echo esc_html($categories[0]->name);
                 }
                 ?>
             </div>
-            
+
             <?php if ('yes' === $settings['show_title']) : ?>
                 <h3 class="post-grid-title">
                     <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                 </h3>
             <?php endif; ?>
-            
+
+            <?php if ('yes' === $settings['show_desc']) : ?>
+                <div class="post-grid-excerpt">
+                    <?php echo wp_trim_words(get_the_excerpt(), 20, '...'); ?>
+                </div>
+            <?php endif; ?>
+
             <?php if ('yes' === $settings['show_meta']) : ?>
                 <div class="post-grid-meta">
                     <?php if ('yes' === $settings['show_author']) : ?>
                         <span class="post-grid-author"><?php the_author(); ?></span>
                     <?php endif; ?>
-                    
+
                     <?php if ('yes' === $settings['show_date']) : ?>
                         <span class="post-grid-date"><?php echo get_the_date(); ?></span>
                     <?php endif; ?>
-                    
+
                     <?php if ('yes' === $settings['show_comments']) : ?>
                         <span class="post-grid-comments"><?php echo get_comments_number(); ?> comments</span>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
-            
-            <div class="post-grid-excerpt">
-                <?php echo wp_trim_words(get_the_excerpt(), 20, '...'); ?>
-            </div>
+
             <hr class="post-grid-divider">
         </div>
-        <?php
+<?php
     }
 
-    private function get_post_types() {
+
+    private function get_post_types()
+    {
         $post_types = get_post_types(['public' => true], 'objects');
         $options = [];
         foreach ($post_types as $post_type) {

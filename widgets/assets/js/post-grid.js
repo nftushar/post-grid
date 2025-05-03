@@ -1,8 +1,6 @@
-    jQuery(document).ready(function ($) {
+    jQuery(document).ready(function ($) { 
 
-
-        $('.post-grid-load-more').on('click', function () {
-            alert('Post Grid JS Loaded!');
+        $('.post-grid-load-more').on('click', function () { 
             const button = $(this);
             const wrapper = button.closest('.custom-post-grid-wrapper');
             const settings = wrapper.data('settings');
@@ -29,7 +27,7 @@
                 success: function (response) {
                     if (response.success && response.data && response.data.html) {
                         wrapper.find('.custom-post-grid').append(response.data.html);
-                        wrapper.attr('data-page', page); // Update page attribute
+                        wrapper.attr('data-page', page); 
                         button.text('Load More');
                     } else {
                         button.text('No more posts').prop('disabled', true);
