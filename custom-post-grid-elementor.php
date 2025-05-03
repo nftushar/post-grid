@@ -7,7 +7,7 @@
  */
 
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+    exit;  
 }
 
 function register_custom_post_grid_widget() {
@@ -43,7 +43,7 @@ function custom_post_grid_load_more() {
         while ($query->have_posts()) {
             $query->the_post();
             
-            // Use the same rendering function as the initial load
+          
             echo '<div class="post-grid-item">';
             
             if ('yes' === $settings['show_featured_image'] && has_post_thumbnail()) {

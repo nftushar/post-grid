@@ -21,7 +21,7 @@ jQuery(document).ready(function ($) {
                     wrapper.find('.custom-post-grid').append(response.data.html);
                     wrapper.attr('data-page', page);
                     
-                    // Update max pages from the response
+           
                     const maxPages = response.data.max_pages || button.data('max-pages');
                     button.data('max-pages', maxPages);
                     
